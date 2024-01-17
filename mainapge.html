@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andalos</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+       #bookDetailsModal {
+            display: none;
+            max-width: 800px;
+            width: 80%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1001;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .selected-book {
+            display: flex;
+            align-items: center;
+        }
+
+        #bookImage {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+
+
+        .signin-button {
+        margin-right: 20px; /* Adjust the margin as needed */
+        margin-top: 10px; /* Adjust the margin as needed */
+    }
+
+    #signin-btn {
+        background-color: #8b4513;; /* Add your desired button background color */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5dc;
+            display: flex; /* Set display to flex for flexbox layout */
+        }
+
+        nav {
+            flex: 0 0 200px; /* Set a fixed width for the left navigation */
+            background-color: #8b4513;;
+            padding: 10px;
+            
+            color: beige;
+           
+           
+            align-items: center;
+        }
+
+        nav a {
+            color: beige;
+            text-decoration: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-bottom: 10px; /* Add margin between navigation items */
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #593e29;
+        }
+
+        .filter-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }p{
+          padding-bottom: 10px;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter label {
+            font-size: 18px;
+            margin-right: 10px;
+            color: #2d1a0e;
+        }
+
+        #genre {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        .selected-book {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Adjust the book-container style */
+        .book-container {
+            margin-top: 80px; /* Adjusted margin-top */
+            margin-left: 220px; /* Adjusted margin-left */
+            display: flex;
+            gap: 20px;
+            padding: 40px;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .book {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 500px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .book img {
+            width: 90;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+            transition: transform 0.3s ease;
+            float: left;
+            margin-right: 10px;
+        }
+
+        .book:hover {
+            transform: scale(0.95);
+        }
+
+        .book:hover img {
+            transform: scale(1.1);
+        }
+
+        .book-info {
+            padding: 15px;
+            text-align: left;
+        }
+
+        .book h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2d1a0e;
+        }
+
+        .book p {
+            margin: 0;
+            font-size: 14px;
+            color: #593e29;
+        }
+
+        #searchResults {
+        background-color: #fff;
+        color: black;
+        border: 1px solid #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1;
+        width: 200px; /* Make it full width */
+        margin-top: 10px;
+    }
+
+    .search-result-item {
+        padding: 10px;
+        margin-bottom: 5px; /* Add margin between search result items */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-result-item:hover {
+        background-color: #eee;
+        transform: scale(1.05); /* Added hover effect */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Added box-shadow on hover */
+    } body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fbebd4;
+            display: flex;
+            /* Set display to flex for flexbox layout */
+        }
+
+        
+
+        nav {
+            flex: 0 0 200px;
+            /* Set a fixed width for the left navigation */
+            background-color: #8b5d33;
+            padding: 10px;
+            color: beige;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            height: 100%;
+        }
+
+        nav a {
+            color: beige;
+            text-decoration: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            /* Add margin between navigation items */
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #593e29;
+        }
+
+        .filter-nav {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .filter {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .filter label {
+            font-size: 18px;
+            margin-right: 10px;
+            color: #2d1a0e;
+        }
+
+        #genre {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+       
+        .content {
+            width: 100%;
+            height: 50px;
+            margin-left: 100px;
+            background-color: #8b5d33;
+            margin-left: 220px; /* Adjust this value based on your left navigation width */
+            padding: 20px;
+        }#loadingSpinner {
+    display: flex;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+#loadingSpinner::after {
+    content: "";
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #8b4513;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#bookContainer {
+    display: none;
+}
+
+        #genre-filter-container {
+            margin-right: 20px;
+            /* Adjust the margin as needed */
+            text-align: right;
+        }
+
+        #genreFilter {
+            padding: 8px;
+            font-size: 16px;
+        }
+        .top-right {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+}
+       
+.signin-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+
+#signin-btn {
+    background-color: #8b4513;
+    color: white;
+    padding: 10px 15px;
+    
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#searchInputContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding-right: 140px;
+}#searchInput {
+    background-color: white;
+    color: black;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px; /* Adjust the margin as needed */
+}
+
+#genreFilter {
+    padding: 8px;
+    font-size: 16px;
+}
+
+#searchInput {
+    padding: 8px;
+    font-size: 16px;
+}
+#genre-filter-container {
+    margin-right: 20px; /* Adjust the margin as needed */
+}
+
+#filter-search-container {
+   padding-right:400px;
+    align-items: center;
+    margin-right: 20px; /* Adjust the margin as needed */
+}#searchFilterContainer {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}#searchResultsContainer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    
+    background-color: #fff;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 1;
+    width: 200px;
+    margin-left: 75px;
+}.search-result-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    max-width: 150px;
+}#menu.collapsed {
+    width: 60px;
+}
+
+#menu.collapsed #menu-icons a span {
+    display: none;
+}#ima{
+    width: 55px; 
+            margin-bottom: 10px;
+            border-radius: 50%; 
+}#menu-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }#logo {
+    width: 50px;
+    margin-bottom: 10px;
+}
+
+#menu-icons {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    color: beige;
+    text-decoration: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item:hover {
+    background-color: #593e29;
+}
+
+.nav-item i {
+    margin-right: 10px;
+}
+
+    </style>
+</head>
+
+<body>
+    <div id="custom-cursor"></div>
+    <nav>
+        <img id="ima" src="logo.jpg" alt="Your Bookstore Logo"> 
+        <div id="menu-icons">
+            <a href="mainapge.html">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="contactus.html">
+                <i class="fas fa-book"></i>
+                <span>Contact Us</span>
+            </a>
+            <a href="aboutus.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About Us</span>
+            </a>
+        </div>
+        
+        
+        </div>
+    </nav>
+    <div class="top-right">
+        <div class="signin-button">
+            <button id="signin-btn" onclick="window.location.href='login.html';">Sign In</button>
+        </div>
+        <div id="filter-search-container">
+            <label for="genreFilter">Filter by Genre:</label>
+            <select id="genreFilter">
+                <option value="all">All Genres</option>
+                <option value="Psychology">Psychology</option>
+                <option value="Fiction">Fiction</option>
+                <option value="Productivity">Productivity</option>
+                <option value="Self-help">Self-help</option>
+                <option value="History">History</option>
+                <option value="Business">Business</option>
+            </select>
+            <div id="searchInputContainer">
+                <label for="searchInput">Search:</label>
+                <input type="text" id="searchInput" placeholder="Enter search term">
+                <div id="searchResultsContainer"></div>
+            </div>
+        </div>
+    </div>
+    <div id="bookDetailsModal"></div>
+    <div id="loadingSpinner"></div>
+    <div class="book-container" id="bookContainer">
+        <!-- Books will be dynamically added here -->
+    </div>
+
+    <script>
+        // Your Supabase credentials
+        const supabaseUrl = "https://pcmdrclvowkywgzjwzda.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbWRyY2x2b3dreXdnemp3emRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1NzIxMTksImV4cCI6MjAxOTE0ODExOX0.oj1PziGJ9pP6wUNWEBlLKMVBKVPCI3PK9YkTA49D0RE";
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const tableName = "Stock";
+
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const genreFilter = document.getElementById('genreFilter');
+        const searchInput = document.getElementById('searchInput');
+        
+        function removeDuplicates(array, keys) {
+        const uniqueBooks = [];
+        const keySet = new Set();
+
+        array.forEach(item => {
+            const key = keys.map(k => item[k]).join('|');
+            if (!keySet.has(key)) {
+                keySet.add(key);
+                uniqueBooks.push(item);
+            }
+        });
+
+        return uniqueBooks;
+    }
+    document.addEventListener('mousemove', function (e) {
+            const cursor = document.getElementById('custom-cursor');
+            cursor.style.display = 'block';
+            cursor.style.left = e.clientX - cursor.offsetWidth / 2 + 'px';
+            cursor.style.top = e.clientY - cursor.offsetHeight / 2 + 'px';
+        });
+    async function applyFilters() {
+    loadingSpinner.style.display = 'flex';
+
+    const selectedGenre = genreFilter.value.toLowerCase();
+    const searchTerm = searchInput.value.toLowerCase();
+
+    try {
+        const { data, error } = await _supabase.from(tableName).select('*');
+        if (error) {
+            console.error('Error fetching data:', error.message);
+        } else {
+            let filteredBooks = data;
+
+            if (selectedGenre !== 'all') {
+                filteredBooks = filteredBooks.filter(book => book.Genre.toLowerCase() === selectedGenre);
+            }
+
+            if (searchTerm.trim() !== '') {
+                filteredBooks = filteredBooks.filter(book =>
+                    book.Title.toLowerCase().includes(searchTerm) ||
+                    book.Author.toLowerCase().includes(searchTerm) ||
+                    book.Genre.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            displayBooks(filteredBooks);
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    } finally {
+        loadingSpinner.style.display = 'none';
+    }
+}
+
+genreFilter.addEventListener('change', applyFilters);
+searchInput.addEventListener('input', applyFilters);
+
+        document.getElementById('genreFilter').onchange = applyFilters;
+        
+        
+const searchResultsContainer = document.getElementById('searchResultsContainer');
+
+searchInput.addEventListener('input', function () {
+    const searchTerm = this.value.toLowerCase();
+    if (searchTerm.trim() === '') {
+        searchResultsContainer.innerHTML = '';
+        fetchData(); // Display all books when search is cleared
+    } else {
+        searchBooks(searchTerm);
+    }
+});
+
+function displaySearchResults(results) {
+    const searchInput = document.getElementById('searchInput');
+    searchResultsContainer.innerHTML = '';
+
+    results.forEach(result => {
+        const resultItem = document.createElement('div');
+        resultItem.textContent = result.Title; // Assuming Title is the property to display
+        resultItem.addEventListener('click', function () {
+            searchInput.value = result.Title;
+            searchResultsContainer.innerHTML = '';
+            searchBooks(result.Title.toLowerCase());
+        });
+
+        searchResultsContainer.appendChild(resultItem);
+    });
+}
+
+        
+        async function searchBooks(searchTerm) {
+            try {
+                const { data, error } = await _supabase.from(tableName).select('*');
+                if (error) {
+                    console.error('Error fetching data:', error.message);
+                } else {
+                    const searchResults = data.filter(book =>
+                        book.Title.toLowerCase().includes(searchTerm) ||
+                        book.Author.toLowerCase().includes(searchTerm) ||
+                        book.Genre.toLowerCase().includes(searchTerm)
+                    );
+                    displaySearchResults(searchResults);
+                    displayBooks(searchResults); // Display filtered books
+                }
+            } catch (error) {
+                console.error('Error:', error.message);
+            }
+        }
+
+        document.addEventListener('click', function (event) {
+            const bookDetailsModal = document.getElementById('bookDetailsModal');
+            if (event.target === bookDetailsModal) {
+                bookDetailsModal.style.display = 'none';
+            }
+        });
+
+        function displayBookDetailsModal(title, author, genre, description, price, rating, imageUrl) {
+            const bookDetailsModal = document.getElementById('bookDetailsModal');
+            bookDetailsModal.innerHTML = `
+                <div class="selected-book">
+                    <img src="${imageUrl}" alt="${title}" id="bookImage" style="width: 200px; border-radius: 8px; margin-right: 20px;">
+                    <div style="display: flex; flex-direction: column;">
+                        <p><strong>Title:</strong> ${title}</p>
+                        <p><strong>Author:</strong> ${author}</p>
+                        <p><strong>Genre:</strong> ${genre}</p>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <p><strong>Price:</strong> ${price}</p>
+                        <p><strong>Rating:</strong> ${rating}</p>
+                    </div>
+                </div>
+            `;
+            bookDetailsModal.style.display = 'block'; // Show the modal
+        }
+
+        function displayBooks(books) {
+            const bookContainer = document.getElementById('bookContainer');
+            bookContainer.innerHTML = '';
+
+            books.forEach(book => {
+                const bookElement = document.createElement('div');
+                bookElement.className = 'book';
+
+                const title = book.Title || 'Title Not Available';
+                const author = book.Author || 'Author Not Available';
+                const genre = book.Genre || 'Genre Not Available';
+                const description = book.Description || 'Description Not Available';
+                const price = book.Price ? `$${book.Price.toFixed(2)}` : 'Price Not Available';
+                const imageUrl = book.ImageUrl || 'Image Not Available';
+                const rating = book.Rating || 'Rating Not Available';
+
+                bookElement.innerHTML = `
+                    <img id="bookImage" src="${imageUrl}" alt="${title}">
+                    <h3>${title}</h3>
+                    <p id="author">Author: ${author}</p>
+                    <p id="genre">Genre: ${genre}</p>
+                    <p id="description">Description: ${description}</p>
+                    <p id="price">Price: ${price}</p>
+                    <p id="rating">Rating: ${rating}</p>
+                `;
+
+                bookContainer.appendChild(bookElement);
+            });
+        }
+
+        async function fetchData() {
+            try {
+                loadingSpinner.style.display = 'flex';
+
+                const { data, error } = await _supabase.from(tableName).select('*');
+                if (error) {
+                    console.error('Error fetching data:', error.message);
+                } else {
+                    const uniqueBooks = removeDuplicates(data, 'Title');
+                    displayBooks(uniqueBooks);
+                }
+            } catch (error) {
+                console.error('Error:', error.message);
+            } finally {
+                loadingSpinner.style.display = 'none';
+                const bookContainer = document.getElementById('bookContainer');
+                bookContainer.style.display = 'flex';
+                attachBookClickListeners();
+            }
+        }
+
+        function removeDuplicates(array, key) {
+            return array.filter((item, index, self) =>
+                index === self.findIndex((i) => i[key] === item[key])
+            );
+        }
+
+        function attachBookClickListeners() {
+            console.log('Attaching book click listeners...');
+            const books = document.querySelectorAll('.book');
+            books.forEach(book => {
+                book.addEventListener('click', function () {
+                    const title = book.querySelector('h3').textContent;
+                    const author = book.querySelector('#author').textContent;
+                    const genre = book.querySelector('#genre').textContent;
+                    const description = book.querySelector('#description').textContent;
+                    const price = book.querySelector('#price').textContent;
+                    const rating = book.querySelector('#rating').textContent;
+                    const imageUrl = book.querySelector('img').src;
+
+                    displayBookDetailsModal(title, author, genre, description, price, rating, imageUrl);
+                });
+            });
+        }
+
+        fetchData();
+    </script>
+</body>
+
+</html>

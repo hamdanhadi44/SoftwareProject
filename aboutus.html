@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Andalos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5dc; /* Beige background color */
+            color: #8b4513; /* Brown text color */
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #8b4513; /* Brown heading color */
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #654321; /* Dark brown text color */
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* Left Navigation Sidebar */
+        #menu {
+            height: 1000px;
+            width: 60px;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            background-color: #8b4513; /* Brown background color for the sidebar */
+            overflow-x: hidden;
+            transition: width 0.5s;
+            padding-top: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #menu a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 14px;
+            color: #f5f5dc; /* Beige text color for the sidebar links */
+            transition: color 0.3s;
+            box-sizing: border-box;
+        }
+
+        #menu i {
+            margin-bottom: 5px;
+        }
+
+        #menu a:hover {
+            color: #d2b48c; /* Light brown on hover */
+        }
+
+        #menu-btn {
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 15px;
+            color: #d2b48c; /* Light brown color for the menu button */
+        }
+
+        #menu-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #menu-btn-small {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #d2b48c; /* Light brown color for the menu button */
+        }
+
+        #menu-icons a span {
+            display: none;
+        }
+
+        #menu.active #menu-icons a span {
+            display: inline-block;
+            margin-left: 5px; /* Adjust the margin as needed */
+        }
+
+        #content {
+            flex: 1;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #content img {
+            max-width: 70%; /* Adjust the percentage to control the image size */
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #instagram-logo {
+            font-size: 30px;
+            color: #8b4513; /* Brown color for the Instagram logo */
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        #instagram-logo:hover {
+            color: #d2b48c; /* Light brown on hover */
+        }
+
+        footer {
+            padding: 10px;
+            background-color: #8b4513; /* Brown background color for the footer */
+            color: #f5f5dc; /* Beige text color for the footer */
+            text-align: center;
+            width: 100%;
+        }
+
+        #signin-btn {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            background-color: #8b4513; /* Brown background color for the button */
+            color: #f5f5dc; /* Beige text color for the button */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #menu img {
+            width: 55px;
+            margin-top: 10px; /* Adjust the width as needed */
+            margin-bottom: 10px;
+            border-radius: 50%; /* Make the logo circular */
+        }
+
+        #signin-btn:hover {
+            background-color: #654321; /* Darker brown on hover */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="menu">
+        <img src="logo.jpg" alt="Bookstore Logo"> 
+        <div id="menu-icons">
+            <a href="mainapge.html">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="contactus.html">
+                <i class="fas fa-book"></i>
+                <span>Contact Us</span>
+            </a>
+            <a href="aboutus.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About Us</span>
+            </a>
+        </div>
+
+        <span id="menu-btn">&#9776;</span>
+    </div>
+
+    <button id="signin-btn" onclick="window.location.href='login.html';">Sign In</button>
+
+    <div id="content">
+        <h1>About Us</h1>
+        <p>Welcome to Your Bookstore! We are dedicated to providing a wide range of books for every reader.</p>
+        <p>Our team is passionate about literature and committed to creating an enriching reading experience for our customers.</p>
+        <p>Feel free to explore our collection and reach out to us if you have any questions or suggestions.</p>
+
+        <img src="why.jpg" alt="Bookstore Image">
+        <br>
+        <p>Check us out on Instagram</p>
+
+        <a id="instagram-logo" href="https://www.instagram.com/andalosbookshop/" target="_blank">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </div>
+
+    <footer>
+        &copy; 2023 Andalos. All rights reserved.
+    </footer>
+
+    <script>
+        document.getElementById('menu-btn').addEventListener('click', function () {
+            document.getElementById('menu').style.width = '250px';
+        });
+
+        document.getElementById("menu-btn").addEventListener("click", function () {
+            var menu = document.getElementById("menu");
+            menu.classList.toggle("active");
+        });
+
+        document.body.addEventListener('click', function (event) {
+            if (!document.getElementById('menu').contains(event.target) && event.target.id !== 'menu-btn') {
+                document.getElementById('menu').style.width = '60px';
+                document.getElementById("menu").classList.remove("active");
+            }
+        });
+
+        // Expand the sidebar when clicking on a navigation item
+        document.querySelectorAll('#menu a').forEach(function (item) {
+            item.addEventListener('click', function () {
+                document.getElementById('menu').style.width = '250px';
+            });
+        });
+    </script>
+
+</body>
+
+</html>

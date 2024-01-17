@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login page for Andalos Bookstore admin">
+    <meta name="keywords" content="Andalos, Bookstore, admin, login">
+    <meta name="author" content="ahmad tr">
+
+    <title>Login - Andalos Bookstore</title>
+
+    
+</head>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5dc; /* Beige background color */
+        color: #8b4513; /* Brown text color */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+    #text {
+        padding-top: 10px; /* Adjust the padding based on your preference */
+    }
+    .brand-container {
+        text-align: center;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar {
+        width: 80px; /* Adjust the size based on your preference */
+        height: 80px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .brand-container span {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .login-container {
+        width: 500px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: #8b4513; /* Brown heading color */
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 5px;
+    }
+
+    input {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #8b4513; /* Brown border color for inputs */
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: #8b4513; /* Brown button color */
+        color: #fff;
+        padding: 10px;
+        cursor: pointer;
+        border: none;
+        border-radius: 4px;
+    }
+
+    button:hover {
+        background-color: #654321; /* Darker brown on hover */
+    }
+
+    p {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    a {
+        color: #8b4513; /* Brown link color */
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    a:hover {
+        color: #654321; /* Darker brown on hover */
+    }.error-message {
+        color: red;
+        margin-top: 10px;
+        text-align: center;
+        display: none;
+    }
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+
+<script>
+    // Initialize Supabase
+    const supabaseUrl = "https://pcmdrclvowkywgzjwzda.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbWRyY2x2b3dreXdnemp3emRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1NzIxMTksImV4cCI6MjAxOTE0ODExOX0.oj1PziGJ9pP6wUNWEBlLKMVBKVPCI3PK9YkTA49D0RE";
+  const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  function redirectToAdminPage() {
+        console.log('Redirecting to adminpage.html');
+        window.location.href = "AdminPage.html";
+    }
+    function displayErrorMessage(message) {
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.textContent = message;
+        errorMessageElement.style.display = 'block';
+    }
+
+    async function login(email, password) {
+        const { data, error } = await _supabase.from('AdminAccounts').select('*').eq('Email', email).eq('Password', password);
+        console.log(data);
+
+        if (error) {
+            console.error('Error fetching data from Supabase:', error.message);
+            return;
+        }
+
+        if (data.length > 0) {
+            console.log('Login successful!');
+            redirectToAdminPage();
+        } else {
+            console.log('Invalid email or password.');
+            displayErrorMessage("invalid email or password")
+        }
+    }
+
+    // Add an event listener to the form
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginForm = document.querySelector('form');
+
+        loginForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting in the traditional way
+
+            // Get the values from the form fields
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Call the login function with the entered values
+            login(email, password);
+        });
+    });
+
+</script>
+
+<body>
+
+    <div class="brand-container">
+        <img src="logo.jpg" alt="Andalos Avatar" class="avatar">
+        <span id="text">Andalos Bookstore</span>
+    </div>
+
+    <div class="login-container">
+        <h1>Login As Admin</h1>
+        <form>
+            <label for="username" >email:</label>
+            <input type="email" placeholder="email@something.com" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" placeholder="yourPassword" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        <p id="error-message" class="error-message"></p>
+    </div>
+
+</body>
+
+</html>
