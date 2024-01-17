@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Analytics</title>
+  <link rel="stylesheet" href="AnalyticsPage.css">
+
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-box-and-violin-plot"></script>
+
+  <!-- Include Supabase.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <h1>Sales Analytics</h1>
+
+  <!-- Pie Chart: Most Sold Genres -->
+  <div style="width: 50%; display: inline-block;">
+    <h2>Genres of Books Sold</h2>
+    <canvas id="genreChart"></canvas>
+  </div>
+
+  <!-- Table: Top 5 Authors -->
+  <div style="width: 50%; display: inline-block;">
+    <h2>Top 5 Authors</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Author</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody id="topAuthorsTable"></tbody>
+    </table>
+  </div>
+  <!-- Table: Top 5 Books -->
+    <div style="width: 50%; display: inline-block;">
+    <h2>Top 5 Books Sold</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Total Sales</th>
+        </tr>
+      </thead>
+      <tbody id="topBooksTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Line Plot: Sum of Prices in the Last 10 Days -->
+  <div style="width: 50%; display: inline-block;">
+    <h2>Total Sold Prices in the Last 30 Days</h2>
+    <canvas id="sumPricesLinePlot"></canvas>
+  </div>
+
+  
+
+  
+
+  
+
+
+
+
+  <!-- Include your JavaScript code -->
+  <script>
+    // Replace 'YOUR_SUPABASE_URL' and 'YOUR_SUPABASE_API_KEY' with your actual Supabase URL and API key
+    const supabaseUrl = 'https://pcmdrclvowkywgzjwzda.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbWRyY2x2b3dreXdnemp3emRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1NzIxMTksImV4cCI6MjAxOTE0ODExOX0.oj1PziGJ9pP6wUNWEBlLKMVBKVPCI3PK9YkTA49D0RE';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // Function to fetch data from Supabase
+    async function fetchData() {
+      const { data, error } = await _supabase.from('Sales').select('*');
+
+      if (error) {
+        console.error('Error fetching data:', error.message);
+        return [];
+      }
+
+      return data;
+    }
+
+    // Function to render pie chart
+    async function renderGenreChart() {
+      const data = await fetchData();
+      const genres = {};
+      data.forEach(item => {
+        genres[item.Genre] = genres[item.Genre] ? genres[item.Genre] + 1 : 1;
+      });
+
+      const genreLabels = Object.keys(genres);
+      const genreData = Object.values(genres);
+
+      const ctx = document.getElementById('genreChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: genreLabels,
+          datasets: [{
+            data: genreData,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#8e5ea2', '#3cba9f'],
+          }]
+        }
+      });
+    }
+
+    // Function to render top 5 authors table
+    async function renderTopAuthorsTable() {
+      const data = await fetchData();
+      const authors = {};
+      data.forEach(item => {
+        authors[item.Author] = authors[item.Author] ? authors[item.Author] + 1 : 1;
+      });
+
+      const sortedAuthors = Object.keys(authors).sort((a, b) => authors[b] - authors[a]).slice(0, 5);
+
+      const tableBody = document.getElementById('topAuthorsTable');
+      sortedAuthors.forEach(author => {
+        const row = tableBody.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        cell1.textContent = author;
+        cell2.textContent = authors[author];
+      });
+    }
+
+    // Function to render line plot
+    async function renderSalesOverTime() {
+      const data = await fetchData();
+      const dates = [];
+      const sales = [];
+      data.forEach(item => {
+        dates.push(item.Date);
+        sales.push(item.Price);
+      });
+
+      const ctx = document.getElementById('salesOverTime').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Sales Over Time',
+            data: sales,
+            borderColor: '#FF6384',
+            fill: false,
+          }]
+        }
+      });
+    }
+    async function renderTopBooksTable() {
+  const data = await fetchData();
+  const books = {};
+  data.forEach(item => {
+    const bookKey = `${item.Title} - ${item.Author}`; // Combine title and author as a unique key
+    books[bookKey] = books[bookKey] ? books[bookKey] + 1 : 1;
+  });
+
+  const sortedBooks = Object.keys(books).sort((a, b) => books[b] - books[a]).slice(0, 5);
+
+  const tableBody = document.getElementById('topBooksTable');
+  sortedBooks.forEach(book => {
+    const row = tableBody.insertRow();
+    const cell1 = row.insertCell(0);
+    const cell2 = row.insertCell(1);
+    cell1.textContent = book.split(' - ')[0]; // Extract title from the combined key
+    cell2.textContent = books[book];
+  });
+}
+
+// Call the function to render the top 5 books table
+renderTopBooksTable();
+    // Function to render ratings histogram
+
+
+
+
+
+
+    // Call the functions to render charts and tables
+    renderGenreChart();
+    renderTopAuthorsTable();
+    // Function to render boxplot for prices
+
+  // Function to filter data for the last 10 days and calculate the sum of prices
+  async function getSumPricesLast10Days() {
+      const data = await fetchData();
+      const currentDate = new Date();
+      const last10Days = new Date(currentDate);
+      last10Days.setDate(currentDate.getDate() - 30);
+
+      const filteredData = data.filter(item => {
+        const itemDate = new Date(item.Date);
+        return itemDate >= last10Days && itemDate <= currentDate;
+      });
+
+      const sumPricesByDay = {};
+      filteredData.forEach(item => {
+        const day = item.Date; // You may want to format this date based on your data structure
+        sumPricesByDay[day] = sumPricesByDay[day] ? sumPricesByDay[day] + item.Price : item.Price;
+      });
+
+      return sumPricesByDay;
+    }
+
+    // Function to render line plot for the sum of prices in the last 10 days
+    async function renderSumPricesLinePlot() {
+      const sumPricesByDay = await getSumPricesLast10Days();
+      const dates = Object.keys(sumPricesByDay);
+      const sumPrices = Object.values(sumPricesByDay);
+
+      const ctx = document.getElementById('sumPricesLinePlot').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Total price sold',
+            data: sumPrices,
+            borderColor: '#FF6384',
+            fill: false,
+          }]
+        }
+      });
+    }
+
+    // ... (Your existing code)
+
+    // Call the function to render the line plot for the sum of prices in the last 10 days
+    renderSumPricesLinePlot();
+  
+  </script>
+</body>
+</html>

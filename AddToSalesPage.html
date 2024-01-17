@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add to Sales</title>
+  <link rel="stylesheet" href="AddSales.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div id="stock-container">
+    <h1>Add to Sales</h1>
+    <div id="book-list"></div>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://pcmdrclvowkywgzjwzda.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbWRyY2x2b3dreXdnemp3emRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1NzIxMTksImV4cCI6MjAxOTE0ODExOX0.oj1PziGJ9pP6wUNWEBlLKMVBKVPCI3PK9YkTA49D0RE';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const bookListContainer = document.getElementById('book-list');
+
+    async function fetchBooks() {
+      const { data, error } = await _supabase.from('Stock').select('*');
+
+      if (error) {
+        console.error('Error fetching books:', error.message);
+        return;
+      }
+
+      renderBooks(data);
+    }
+
+    function renderBooks(books) {
+      bookListContainer.innerHTML = '';
+
+      books.forEach(book => {
+        const bookCard = document.createElement('div');
+        bookCard.className = 'book-card';
+
+        const bookInfo = document.createElement('div');
+        bookInfo.className = 'book-info';
+        bookInfo.innerHTML = `
+          <h2>${book.Title}</h2>
+          <p><strong>Book Id:</strong> ${book.Book_id}</p>
+
+          <p><strong>Price:</strong> $${book.Price}</p>
+        `;
+
+        const addToSalesButton = document.createElement('button');
+        addToSalesButton.textContent = 'Add to Sales';
+        addToSalesButton.addEventListener('click', () => addToSales(book));
+
+        bookCard.appendChild(bookInfo);
+        bookCard.appendChild(addToSalesButton);
+
+        bookListContainer.appendChild(bookCard);
+      });
+    }
+
+    async function addToSales(book) {
+      // Remove book from Stock table
+      const { data: removeData, error: removeError } = await _supabase
+        .from('Stock')
+        .delete()
+        .eq('Book_id', book.Book_id);
+
+      if (removeError) {
+        console.error('Error removing book from stock:', removeError.message);
+        return;
+      }
+
+      // Add book to Sales table
+      const { data: addData, error: addError } = await _supabase
+        .from('Sales')
+        .insert([
+          {
+            Author: book.Author,
+            Price: book.Price,
+            Rating: book.Rating,
+            Genre: book.Genre,
+            Title: book.Title,
+            Date: new Date().toISOString(),
+          },
+        ]);
+
+      if (addError) {
+        console.error('Error adding book to sales:', addError.message);
+        return;
+      }
+
+      // Refresh the book list after the update
+      fetchBooks();
+    }
+
+    // Fetch books when the page loads
+    fetchBooks();
+  </script>
+</body>
+</html>

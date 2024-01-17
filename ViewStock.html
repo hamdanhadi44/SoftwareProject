@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Management</title>
+  <link rel="stylesheet" href="ViewStock.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div id="stock-container">
+    <h1>Book Stock</h1>
+    <div id="book-list"></div>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://pcmdrclvowkywgzjwzda.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjbWRyY2x2b3dreXdnemp3emRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM1NzIxMTksImV4cCI6MjAxOTE0ODExOX0.oj1PziGJ9pP6wUNWEBlLKMVBKVPCI3PK9YkTA49D0RE';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const bookListContainer = document.getElementById('book-list');
+
+    async function fetchBooks() {
+      const { data, error } = await _supabase.from('Stock').select('*');
+
+      if (error) {
+        console.error('Error fetching books:', error.message);
+        return;
+      }
+
+      renderBooks(data);
+    }
+
+    function renderBooks(books) {
+      bookListContainer.innerHTML = '';
+
+      books.forEach(book => {
+        const bookCard = document.createElement('div');
+        bookCard.className = 'book-card';
+
+        const bookInfo = document.createElement('div');
+        bookInfo.className = 'book-info';
+        bookInfo.innerHTML = `
+
+          <h2>${book.Title}</h2>
+          <p><strong>ID:</strong> ${book.Book_id}</p>
+
+          <p><strong>Author:</strong> ${book.Author}</p>
+          <p><strong>Description:</strong> ${book.Description}</p>
+          <p><strong>Rating:</strong> ${book.Rating}</p>
+          <p><strong>Price:</strong> $${book.Price}</p>
+          <p><strong>Genre:</strong> ${book.Genre}</p>
+        `;
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove from Stock';
+        removeButton.addEventListener('click', () => removeBook(book.Book_id));
+
+        bookCard.appendChild(bookInfo);
+        bookCard.appendChild(removeButton);
+
+        bookListContainer.appendChild(bookCard);
+      });
+    }
+
+    async function removeBook(bookId) {
+      const { data, error } = await _supabase.from('Stock').delete().eq('Book_id', bookId);
+
+      if (error) {
+        console.error('Error removing book:', error.message);
+        return;
+      }
+
+      // Refresh the book list after removal
+      fetchBooks();
+    }
+
+    // Fetch books when the page loads
+    fetchBooks();
+  </script>
+</body>
+</html>
